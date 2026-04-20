@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>{{ endpoint.hostname }} — RAPTOR EDR</title>
+<link rel="stylesheet" href="/static/css/style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
+</head>
+<body>
+<nav class="nav">
+  <span class="nav-brand">&#128737; RAPTOR EDR</span>
+  <a href="/">Dashboard</a>
+  <a href="/endpoints">Endpoints</a>
+  <a href="/alerts">Alerts</a>
+</nav>
+<div class="container">
+  <a href="/endpoints" style="color:var(--text2);font-size:.85em">&larr; Endpoints</a>
+  <h1 class="page-title" style="margin-top:12px">{{ endpoint.hostname }}</h1>
+
+  <div style="display:grid;grid-template-columns:1fr 2fr;gap:20px">
+    <div>
+      <div class="card">
+        <h3 style="color:var(--accent);margin-bottom:14px">Endpoint Info</h3>
+        <p><strong>OS:</strong> {{ endpoint.os_type }}</p>
+        <p><strong>IP:</strong> <code>{{ endpoint.ip_address }}</code></p>
+        <p><strong>Agent:</strong> {{ endpoint.agent_version }}</p>
+        <p><strong>Status:</strong> <span class="badge badge-{{ endpoint.status }}">{{ endpoint.status }}</span></p>
+        <p><strong>Risk Score:</strong> {{ endpoint.risk_score|round(1) }}</p>
+        <p style="margin-top:12px"><strong>Last Seen:</strong> {{ endpoint.last_seen.strftime('%Y-%m-%d %H:%M') }}</p>
+        <div style="margin-top:16px;display:flex;gap:8px">
+          <button class="btn btn-danger" onclick="executeResponse('isolate_endpoint','{{ endpoint.ip_address }}','')">Isolate</button>
+          <button class="btn btn-secondary" onclick="executeResponse('collect_forensics','{{ endpoint.hostname }}','')">Forensics</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="color:var(--accent);margin-bottom:14px">Alerts ({{ alerts|length }})</h3>
+        {% for alert in alerts %}
+        <div style="border-left:3px solid {% if alert.severity=='CRITICAL' %}var(--red){% elif alert.severity=='HIGH' %}var(--orange){% else %}var(--yellow){% endif %};padding:8px 12px;margin-bottom:8px;background:var(--bg3);border-radius:0 4px 4px 0">
+          <span class="badge badge-{{ alert.severity.lower() }}">{{ alert.severity }}</span>
+          <span style="font-size:.88em;margin-left:8px">{{ alert.title }}</span>
+        </div>
+        {% else %}
+        <p style="color:var(--text2)">No alerts.</p>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="color:var(--accent);margin-bottom:14px">Recent Events</h3>
+      <table>
+        <thead><tr><th>Type</th><th>Process</th><th>Cmdline</th><th>User</th><th>Time</th></tr></thead>
+        <tbody>
+        {% for event in events %}
+        <tr>
+          <td><span class="badge badge-info">{{ event.event_type }}</span></td>
+          <td style="font-family:monospace;font-size:.82em">{{ event.process_name }}</td>
+          <td style="color:var(--text2);font-size:.8em;max-width:250px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ event.cmdline }}</td>
+          <td style="font-size:.82em">{{ event.username }}</td>
+          <td style="color:var(--text2);font-size:.8em">{{ event.timestamp.strftime('%H:%M:%S') }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<script src="/static/js/app.js"></script>
+</body>
+</html>

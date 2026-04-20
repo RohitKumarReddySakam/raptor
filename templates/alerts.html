@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Alerts — RAPTOR EDR</title>
+<link rel="stylesheet" href="/static/css/style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
+</head>
+<body>
+<nav class="nav">
+  <span class="nav-brand">&#128737; RAPTOR EDR</span>
+  <a href="/">Dashboard</a>
+  <a href="/endpoints">Endpoints</a>
+  <a href="/alerts">Alerts</a>
+</nav>
+<div class="container">
+  <h1 class="page-title">Alerts</h1>
+  <div class="card">
+    <table>
+      <thead><tr><th>Severity</th><th>Title</th><th>Endpoint</th><th>MITRE Tactic</th><th>Technique</th><th>Status</th><th>Time</th><th>Actions</th></tr></thead>
+      <tbody>
+      {% for alert in alerts %}
+      {% set ad = alert.to_dict() %}
+      <tr class="alert-row-{{ alert.severity.lower() }}">
+        <td><span class="badge badge-{{ alert.severity.lower() }}">{{ alert.severity }}</span></td>
+        <td>{{ alert.title }}</td>
+        <td style="font-size:.85em">{{ ad.hostname }}</td>
+        <td style="color:var(--text2);font-size:.82em">{{ alert.mitre_tactic }}</td>
+        <td style="font-family:monospace;font-size:.8em;color:var(--blue)">{{ alert.mitre_technique }}</td>
+        <td><span class="badge badge-{{ alert.status }}">{{ alert.status }}</span></td>
+        <td style="color:var(--text2);font-size:.8em">{{ alert.created_at.strftime('%m/%d %H:%M') }}</td>
+        <td>
+          {% if alert.status == 'new' %}
+          <button class="btn btn-secondary" style="font-size:.75em;padding:3px 8px" onclick="updateAlertStatus('{{ alert.id }}','investigating')">Investigate</button>
+          {% elif alert.status == 'investigating' %}
+          <button class="btn btn-secondary" style="font-size:.75em;padding:3px 8px" onclick="updateAlertStatus('{{ alert.id }}','resolved')">Resolve</button>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+<script src="/static/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+rules:
+  - id: GUARD-E001
+    name: "Large Data Transfer to External IP"
+    description: "Process sending unusually large amount of data externally"
+    severity: HIGH
+    mitre_tactic: "Exfiltration"
+    mitre_technique: "T1041"
+    conditions:
+      process_name: ["curl", "wget", "python.exe", "python3", "powershell.exe"]
+      cmdline_contains: ["http://", "https://", "ftp://"]
+
+  - id: GUARD-E002
+    name: "Archiving Sensitive Directories"
+    description: "Compression tool used on sensitive directories"
+    severity: MEDIUM
+    mitre_tactic: "Exfiltration"
+    mitre_technique: "T1560.001"
+    conditions:
+      process_name: ["7z.exe", "zip", "tar", "rar.exe", "winrar.exe"]
+      cmdline_contains: ["/etc/", "/home/", "C:\\Users\\", "Documents", "Desktop"]
+
+  - id: GUARD-E003
+    name: "DNS Tunneling Indicator"
+    description: "Unusually long DNS query strings detected"
+    severity: HIGH
+    mitre_tactic: "Exfiltration"
+    mitre_technique: "T1048.003"
+    conditions:
+      network_dst_port: [53]
+      cmdline_contains: ["nslookup", "dig"]
+
+  - id: GUARD-E004
+    name: "Email Client Sending Attachments"
+    description: "Email client process sending data externally"
+    severity: MEDIUM
+    mitre_tactic: "Exfiltration"
+    mitre_technique: "T1048"
+    conditions:
+      network_dst_port: [25, 465, 587]
+      process_name: ["powershell.exe", "python.exe", "python3", "sendmail"]

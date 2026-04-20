@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>RAPTOR EDR</title>
+<link rel="stylesheet" href="/static/css/style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
+</head>
+<body>
+<nav class="nav">
+  <span class="nav-brand">&#128737; RAPTOR EDR</span>
+  <a href="/">Dashboard</a>
+  <a href="/endpoints">Endpoints</a>
+  <a href="/alerts">Alerts <span id="open-alerts-badge" style="background:var(--red);color:#fff;border-radius:10px;padding:1px 7px;font-size:.75em">{{ open_alerts }}</span></a>
+</nav>
+<div class="container">
+  <h1 class="page-title">Endpoint Detection &amp; Response</h1>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-value">{{ total_endpoints }}</div><div class="stat-label">Total Endpoints</div></div>
+    <div class="stat-card"><div class="stat-value" style="color:var(--accent)">{{ active_endpoints }}</div><div class="stat-label">Active</div></div>
+    <div class="stat-card"><div class="stat-value" style="color:var(--red)">{{ open_alerts }}</div><div class="stat-label">Open Alerts</div></div>
+    <div class="stat-card"><div class="stat-value" style="color:var(--red)">{{ critical_alerts }}</div><div class="stat-label">Critical</div></div>
+  </div>
+
+  <div class="card">
+    <h3 style="color:var(--accent);margin-bottom:14px">Recent Alerts</h3>
+    {% if recent_alerts %}
+    <table>
+      <thead><tr><th>Severity</th><th>Title</th><th>Endpoint</th><th>MITRE</th><th>Status</th><th>Time</th></tr></thead>
+      <tbody>
+      {% for alert in recent_alerts %}
+      <tr>
+        <td><span class="badge badge-{{ alert.severity.lower() }}">{{ alert.severity }}</span></td>
+        <td>{{ alert.title }}</td>
+        <td>{{ alert.to_dict().hostname }}</td>
+        <td style="color:var(--text2);font-size:.82em">{{ alert.mitre_tactic }}</td>
+        <td><span class="badge badge-{{ alert.status }}">{{ alert.status }}</span></td>
+        <td style="color:var(--text2);font-size:.82em">{{ alert.created_at.strftime('%m/%d %H:%M') }}</td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p style="color:var(--text2)">No alerts yet.</p>
+    {% endif %}
+  </div>
+</div>
+<script src="/static/js/app.js"></script>
+</body>
+</html>

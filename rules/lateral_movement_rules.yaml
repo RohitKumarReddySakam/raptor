@@ -1,0 +1,48 @@
+rules:
+  - id: GUARD-L001
+    name: "PsExec Remote Execution"
+    description: "PsExec used for remote command execution"
+    severity: HIGH
+    mitre_tactic: "Lateral Movement"
+    mitre_technique: "T1021.002"
+    conditions:
+      process_name: ["psexec.exe", "psexec64.exe"]
+
+  - id: GUARD-L002
+    name: "Pass-the-Hash via Mimikatz"
+    description: "Mimikatz credential dumping detected"
+    severity: CRITICAL
+    mitre_tactic: "Lateral Movement"
+    mitre_technique: "T1550.002"
+    conditions:
+      cmdline_contains: ["sekurlsa::", "lsadump::", "kerberos::", "privilege::debug"]
+
+  - id: GUARD-L003
+    name: "WMI Remote Execution"
+    description: "WMIC used to execute commands on remote hosts"
+    severity: HIGH
+    mitre_tactic: "Lateral Movement"
+    mitre_technique: "T1021.006"
+    conditions:
+      process_name: ["wmic.exe"]
+      cmdline_contains: ["/node:", "process call create"]
+
+  - id: GUARD-L004
+    name: "SMB Lateral Movement"
+    description: "Unusual SMB connection to internal hosts"
+    severity: MEDIUM
+    mitre_tactic: "Lateral Movement"
+    mitre_technique: "T1021.002"
+    conditions:
+      network_dst_port: [445]
+      process_name: ["cmd.exe", "powershell.exe", "net.exe"]
+
+  - id: GUARD-L005
+    name: "SSH Brute Force from Internal Host"
+    description: "SSH connection attempts from internal endpoint"
+    severity: MEDIUM
+    mitre_tactic: "Lateral Movement"
+    mitre_technique: "T1021.004"
+    conditions:
+      network_dst_port: [22]
+      process_name: ["ssh", "sshpass"]

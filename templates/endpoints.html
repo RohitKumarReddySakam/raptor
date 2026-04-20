@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Endpoints — RAPTOR EDR</title>
+<link rel="stylesheet" href="/static/css/style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
+</head>
+<body>
+<nav class="nav">
+  <span class="nav-brand">&#128737; RAPTOR EDR</span>
+  <a href="/">Dashboard</a>
+  <a href="/endpoints">Endpoints</a>
+  <a href="/alerts">Alerts</a>
+</nav>
+<div class="container">
+  <h1 class="page-title">Endpoint Inventory</h1>
+  <div class="card">
+    <table>
+      <thead><tr><th>Hostname</th><th>OS</th><th>IP</th><th>Status</th><th>Risk Score</th><th>Agent</th><th>Last Seen</th><th></th></tr></thead>
+      <tbody>
+      {% for ep in endpoints %}
+      <tr>
+        <td><a href="/endpoint/{{ ep.id }}">{{ ep.hostname }}</a></td>
+        <td style="color:var(--text2)">{{ ep.os_type }}</td>
+        <td style="font-family:monospace;font-size:.85em">{{ ep.ip_address }}</td>
+        <td><span class="badge badge-{{ ep.status }}">{{ ep.status }}</span></td>
+        <td>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="flex:1;background:var(--bg3);border-radius:3px;height:5px">
+              <div style="width:{{ ep.risk_score }}%;height:100%;background:{% if ep.risk_score>=70 %}var(--red){% elif ep.risk_score>=40 %}var(--orange){% else %}var(--accent){% endif %};border-radius:3px"></div>
+            </div>
+            <span style="font-size:.82em;color:var(--text2)">{{ ep.risk_score|round(0)|int }}</span>
+          </div>
+        </td>
+        <td style="color:var(--text2);font-size:.82em">{{ ep.agent_version }}</td>
+        <td style="color:var(--text2);font-size:.82em">{{ ep.last_seen.strftime('%Y-%m-%d %H:%M') }}</td>
+        <td><a href="/endpoint/{{ ep.id }}" class="btn btn-secondary" style="font-size:.78em;padding:4px 10px">Details</a></td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+<script src="/static/js/app.js"></script>
+</body>
+</html>
